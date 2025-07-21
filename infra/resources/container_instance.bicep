@@ -54,7 +54,7 @@ param max_agent_retry string = '5'
 param router_type string = 'TRIAGE_AGENT'
 // param image string = 'mcr.microsoft.com/azure-cli'
 param port int = 8000
-param repository string = 'https://github.com/Azure-Samples/Azure-Language-OpenAI-Conversational-Agent-Accelerator'
+param repository string = 'https://github.com/hnviet/Azure-Language-OpenAI-Conversational-Agent-Accelerator.git'
  
 // Managed Identity:
 @description('Name of managed identity to use for Container Apps.')
@@ -67,6 +67,10 @@ resource managed_identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023
 @description('Name of your Azure Container Registry')
 param acr_name string = 'hnvietacr'
 param image_tag string = 'latest'
+
+// ACS Connection String:
+@description('Connection string for Azure Communication Service (SMS)')
+param acs_connection_string string
 
 // Reference existing ACR to pull credentials
 resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
@@ -102,6 +106,7 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
         name: 'repo'
         gitRepo: {
           repository: repository
+          revision: 'main'
           directory: 'repo'
         }
       }
@@ -271,6 +276,10 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
               name: 'MAX_AGENT_RETRY'
               value: max_agent_retry
             }
+            {
+              name:  'ACS_CONNECTION_STRING'
+              value: acs_connection_string
+            }            
           ]
         }
       }

@@ -18,6 +18,7 @@ environments:
       # these must exactly match your bicep params:
       acr_name:    "hnvietacr"    # NOT acrName
       image_tag:   "latest"       # your new param
+      as_connection_string : ${{ secrets.ACS_CONNECTION_STRING }}
 
 hooks:
   postprovision:

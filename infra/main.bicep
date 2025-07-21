@@ -47,6 +47,10 @@ param acr_name string
 @description('Tag for the container image in ACR')
 param image_tag string
 
+// ACS Connection String:
+@description('Connection string for Azure Communication Service (SMS)')
+param acs_connection_string string
+
 // Variables:
 var suffix = uniqueString(subscription().id, resourceGroup().id, resourceGroup().location)
 
@@ -109,7 +113,7 @@ module container_instance 'resources/container_instance.bicep' = {
     language_endpoint: ai_foundry.outputs.language_endpoint
     managed_identity_name: managed_identity.outputs.name
     search_endpoint: search_service.outputs.endpoint
-    search_index_name: '<your-search-index-name>'
+    search_index_name: 'contoso-outdoors-manuals'
     blob_container_name: storage_account.outputs.blob_container_name
     embedding_deployment_name: ai_foundry.outputs.embedding_deployment_name
     embedding_model_name: ai_foundry.outputs.embedding_model_name
@@ -118,6 +122,8 @@ module container_instance 'resources/container_instance.bicep' = {
     storage_account_name: storage_account.outputs.name
     acr_name: acr_name
     image_tag: image_tag
+    acs_connection_string : acs_connection_string
+    
     // image_tag and port have defaults; override if needed:
     // image_tag: 'v2'
     // port: 8000
