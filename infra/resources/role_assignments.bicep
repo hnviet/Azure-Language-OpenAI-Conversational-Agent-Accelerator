@@ -10,6 +10,9 @@ param ai_foundry_name string
 @description('Name of Search Service resource.')
 param search_service_name string
 
+@description('Name of your Azure Container Registry')
+param acr_name string
+
 //----------- Managed Identity Resource -----------//
 resource managed_identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: managed_identity_name
@@ -194,3 +197,22 @@ resource azure_ai_account_user_role 'Microsoft.Authorization/roleDefinitions@202
 
 //----------- Outputs -----------//
 output name string = managed_identity.name
+
+resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
+  name: acr_name
+}
+
+@description('Built-in AcrPull role definition ID')
+resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+}
+
+resource miAcrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(acr.id, managed_identity.id, acrPullRole.id)
+  scope: acr
+  properties: {
+    principalId: managed_identity.properties.principalId
+    roleDefinitionId: acrPullRole.id
+    principalType: 'ServicePrincipal'
+  }
+}

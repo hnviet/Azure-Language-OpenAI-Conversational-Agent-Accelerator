@@ -50,8 +50,9 @@ param max_agent_retry string = '5'
   'FUNCTION_CALLING'
   'TRIAGE_AGENT'
 ])
+
 param router_type string = 'TRIAGE_AGENT'
-param image string = 'mcr.microsoft.com/azure-cli'
+// param image string = 'mcr.microsoft.com/azure-cli'
 param port int = 8000
 param repository string = 'https://github.com/Azure-Samples/Azure-Language-OpenAI-Conversational-Agent-Accelerator'
  
@@ -63,6 +64,19 @@ resource managed_identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023
   name: managed_identity_name
 }
 
+@description('Name of your Azure Container Registry')
+param acr_name string = 'hnvietacr'
+param image_tag string = 'latest'
+
+// Reference existing ACR to pull credentials
+resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
+  name: acr_name
+}
+
+// Retrieve ACR admin credentials (ensure adminUserEnabled = true or use service principal)
+var acrCreds = listCredentials(acr.id, '2022-12-01')
+
+
 //----------- Container Instance Resource -----------//
 resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
   name: name
@@ -70,17 +84,25 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managed_identity.id}' : {}
+      '${resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', managed_identity_name)}': {}
     }
   }
   properties: {
+    // Provide registry credentials so ACI can pull the image
+    imageRegistryCredentials: [
+      {
+        server: acr.properties.loginServer
+        username: acrCreds.username
+        password: acrCreds.passwords[0].value
+      }
+    ]
     restartPolicy: 'Never'
     volumes: [
       {
         name: 'repo'
         gitRepo: {
-          directory: 'repo'
           repository: repository
+          directory: 'repo'
         }
       }
     ]
@@ -100,7 +122,7 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
       {
         name: 'conv-agent-app'
         properties: {
-          image: image
+          image: '${acr_name}.azurecr.io/conv-agent-app:${image_tag}'
           resources: {
             requests: {
               cpu: 1
@@ -122,7 +144,7 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
           command: [
             '/bin/bash'
             '-c'
-            'chmod +x mnt/repo/infra/scripts/run_container_app.sh && bash mnt/repo/infra/scripts/run_container_app.sh'
+            'chmod +x /mnt/repo/infra/scripts/run_container_app.sh && bash /mnt/repo/infra/scripts/run_container_app.sh'
           ]
           environmentVariables: [
             {

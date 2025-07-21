@@ -3,28 +3,35 @@
 name: azure-language-openai-conversational-agent
 metadata:
   template: azure-language-openai-conversational-agent@1.0
-# workflows:
-#   up:
-#     steps:
-#       - azd: provision # azd deploy not needed, as we directly provision the app below
-# services:
-#   app:
-#     project: src
-#     language: python
-#     host: containerapp # containerinstance not supported
+
+environments:
+  dev:
+    parameters:
+      # must match your existing AI Foundry SKUs & capacities:
+      gpt_model_name:            "gpt-4o-mini"
+      gpt_deployment_capacity:   1
+      gpt_deployment_type:       "GlobalStandard"
+      embedding_model_name:      "text-embedding-ada-002"
+      embedding_deployment_capacity: 1
+      embedding_deployment_type: "GlobalStandard"
+
+      # these must exactly match your bicep params:
+      acr_name:    "hnvietacr"    # NOT acrName
+      image_tag:   "latest"       # your new param
+
 hooks:
   postprovision:
-    windows:
-      run: |
-        Write-Host "Web app URL: "
-        Write-Host "$env:WEB_APP_URL" -ForegroundColor Cyan
-      shell: pwsh
-      continueOnError: false
-      interactive: true
     posix:
       run: |
-        echo "Web app URL: "
+        echo "Web app URL:"
         echo $WEB_APP_URL
       shell: sh
+      continueOnError: false
+      interactive: true
+    windows:
+      run: |
+        Write-Host "Web app URL:"
+        Write-Host "$env:WEB_APP_URL" -ForegroundColor Cyan
+      shell: pwsh
       continueOnError: false
       interactive: true

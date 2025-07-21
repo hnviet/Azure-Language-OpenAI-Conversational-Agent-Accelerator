@@ -4,7 +4,8 @@ import os
 import json
 import logging
 import pii_redacter
-from fastapi import FastAPI, HTTPException
+from typing import Any, Dict, List
+from fastapi import Body,FastAPI, HTTPException
 from fastapi.concurrency import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
@@ -15,6 +16,7 @@ from semantic_kernel.agents import AzureAIAgent
 from utils import get_azure_credential
 from aoai_client import AOAIClient, get_prompt
 from azure.search.documents import SearchClient
+from azure.communication.sms.aio import SmsClient
 
 # Run locally with `uvicorn app:app --reload --host 127.0.0.1 --port 7000`
 # Comment out for local testing:
@@ -68,7 +70,6 @@ DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "dist"))
 # log dist_dir
 print(f"DIST_DIR: {DIST_DIR}")
 
-
 # Initialize the Azure Search client
 search_client = SearchClient(
     endpoint=os.environ.get("SEARCH_ENDPOINT"),
@@ -98,6 +99,12 @@ extract_client = AOAIClient(
 PII_ENABLED = os.environ.get("PII_ENABLED", "false").lower() == "true"
 print(f"PII_ENABLED: {PII_ENABLED}")
 
+# after you’ve loaded your other env‐vars:
+SMS_CONN_STR    = os.environ["ACS_CONNECTION_STRING"]
+ACS_PHONE_NUMBER= os.environ["ACS_PHONE_NUMBER"]
+
+# create a long‐lived client
+sms_client = SmsClient.from_connection_string(SMS_CONN_STR)
 
 # Fallback function (RAG) definition:
 def fallback_function(
@@ -224,3 +231,59 @@ async def chat_endpoint(request: ChatRequest):
             content={"error": "An unexpected error occurred"},
             status_code=500
         )
+
+
+@app.post(
+    "/sms",
+    include_in_schema=True,
+    summary="SMS-received webhook",
+    tags=["SMS"]
+)
+async def sms_event_handler(
+    events: List[Dict[str, Any]] = Body(
+        ...,
+        example=[
+            {
+                "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+                "data": { "validationCode": "YOUR_VALIDATION_CODE" }
+            },
+            {
+                "eventType": "Microsoft.Communication.SMSReceived",
+                "data": {
+                    "from": "+15551234567",
+                    "to": "+15557654321",
+                    "message": "hello!"
+                }
+            }
+        ]
+    )
+):
+    # 1) Handle the validation handshake
+    first = events[0]
+    if first.get("eventType") == "Microsoft.EventGrid.SubscriptionValidationEvent":
+        return JSONResponse(
+            status_code=200,
+            content={ "validationResponse": first["data"]["validationCode"] }
+        )
+
+    # 2) Process real SMSReceived events
+    for ev in events:
+        if ev.get("eventType") == "Microsoft.Communication.SMSReceived":
+            sms     = ev["data"]
+            from_nr = sms["from"]
+            text    = sms["message"]
+
+            # get bot replies
+            responses = await orchestrate_chat(text, app.state.orchestrator, chat_id=0)
+
+            # send each response back as SMS
+            for reply in responses:
+                await sms_client.send(
+                    from_=ACS_PHONE_NUMBER,
+                    to=from_nr,
+                    message=reply,
+                    enable_delivery_report=True
+                )
+
+    # 3) Acknowledge delivery
+    return JSONResponse(status_code=200, content={})

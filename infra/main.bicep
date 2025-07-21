@@ -1,4 +1,4 @@
-// ========== main.bicep ========== //
+// ========== main.bicep (final) ========== //
 targetScope = 'resourceGroup'
 
 // GPT model:
@@ -39,6 +39,14 @@ param embedding_deployment_capacity int
 ])
 param embedding_deployment_type string
 
+// Azure Container Registry name:
+@description('Name of your Azure Container Registry')
+param acr_name string
+
+// Azure Container Registry name:
+@description('Tag for the container image in ACR')
+param image_tag string
+
 // Variables:
 var suffix = uniqueString(subscription().id, resourceGroup().id, resourceGroup().location)
 
@@ -69,11 +77,11 @@ module ai_foundry 'resources/ai_foundry.bicep' = {
   params: {
     suffix: suffix
     managed_identity_name: managed_identity.outputs.name
-    search_service_name: search_service.outputs.name
-    gpt_model_name: gpt_model_name
+    search_service_name:   search_service.outputs.name
+    gpt_model_name:        gpt_model_name
     gpt_deployment_capacity: gpt_deployment_capacity
-    gpt_deployment_type: gpt_deployment_type
-    embedding_model_name: embedding_model_name
+    gpt_deployment_type:   gpt_deployment_type
+    embedding_model_name:  embedding_model_name
     embedding_deployment_capacity: embedding_deployment_capacity
     embedding_deployment_type: embedding_deployment_type
   }
@@ -83,9 +91,10 @@ module role_assignments 'resources/role_assignments.bicep' = {
   name: 'create_role_assignments'
   params: {
     managed_identity_name: managed_identity.outputs.name
-    ai_foundry_name: ai_foundry.outputs.name
-    search_service_name: search_service.outputs.name
-    storage_account_name: storage_account.outputs.name
+    ai_foundry_name:       ai_foundry.outputs.name
+    search_service_name:   search_service.outputs.name
+    storage_account_name:  storage_account.outputs.name
+    acr_name:               acr_name          // <-- pass ACR name into role assignments
   }
 }
 
@@ -100,12 +109,18 @@ module container_instance 'resources/container_instance.bicep' = {
     language_endpoint: ai_foundry.outputs.language_endpoint
     managed_identity_name: managed_identity.outputs.name
     search_endpoint: search_service.outputs.endpoint
+    search_index_name: '<your-search-index-name>'
     blob_container_name: storage_account.outputs.blob_container_name
     embedding_deployment_name: ai_foundry.outputs.embedding_deployment_name
-    embedding_model_dimensions: ai_foundry.outputs.embedding_model_dimensions
     embedding_model_name: ai_foundry.outputs.embedding_model_name
+    embedding_model_dimensions: ai_foundry.outputs.embedding_model_dimensions
     storage_account_connection_string: storage_account.outputs.connection_string
     storage_account_name: storage_account.outputs.name
+    acr_name: acr_name
+    image_tag: image_tag
+    // image_tag and port have defaults; override if needed:
+    // image_tag: 'v2'
+    // port: 8000
   }
 }
 
