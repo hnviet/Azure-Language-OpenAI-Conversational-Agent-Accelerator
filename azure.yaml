@@ -18,7 +18,13 @@ environments:
       # these must exactly match your bicep params:
       acr_name:    "hnvietacr"    # NOT acrName
       image_tag:   "latest"       # your new param
-      as_connection_string : ${{ secrets.ACS_CONNECTION_STRING }}
+      acs_connection_string : ${{ secrets.ACS_CONNECTION_STRING }}
+
+services:
+  app:                        # ← this must match the service ID in the template (usually "app")
+    type: containerinstance
+    environmentVariables:
+      ACS_CONNECTION_STRING: ${acs_connection_string}
 
 hooks:
   postprovision:
