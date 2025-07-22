@@ -71,7 +71,6 @@ param image_tag string = 'latest'
 // ACS Connection String:
 @description('Connection string for Azure Communication Service (SMS)')
 param acs_connection_string string
-
 // Reference existing ACR to pull credentials
 resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
   name: acr_name
@@ -79,7 +78,6 @@ resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
 
 // Retrieve ACR admin credentials (ensure adminUserEnabled = true or use service principal)
 var acrCreds = listCredentials(acr.id, '2022-12-01')
-
 
 //----------- Container Instance Resource -----------//
 resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
@@ -279,7 +277,7 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
             {
               name:  'ACS_CONNECTION_STRING'
               value: acs_connection_string
-            }            
+            }           
           ]
         }
       }

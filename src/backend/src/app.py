@@ -101,7 +101,6 @@ print(f"PII_ENABLED: {PII_ENABLED}")
 
 # after you’ve loaded your other env‐vars:
 SMS_CONN_STR    = os.environ["ACS_CONNECTION_STRING"]
-ACS_PHONE_NUMBER= os.environ["ACS_PHONE_NUMBER"]
 
 # create a long‐lived client
 sms_client = SmsClient.from_connection_string(SMS_CONN_STR)
@@ -272,6 +271,7 @@ async def sms_event_handler(
             sms     = ev["data"]
             from_nr = sms["from"]
             text    = sms["message"]
+            to    = sms["to"]
 
             # get bot replies
             responses = await orchestrate_chat(text, app.state.orchestrator, chat_id=0)
@@ -279,7 +279,7 @@ async def sms_event_handler(
             # send each response back as SMS
             for reply in responses:
                 await sms_client.send(
-                    from_=ACS_PHONE_NUMBER,
+                    from_=to,
                     to=from_nr,
                     message=reply,
                     enable_delivery_report=True
