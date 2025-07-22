@@ -20,6 +20,15 @@ environments:
       image_tag:   "latest"       # your new param
       acs_connection_string: ${{ secrets.ACS_CONNECTION_STRING }}
 
+
+services:
+  app:
+    type: containerinstance
+    host: conv-agent-app
+    environmentVariables:
+      # inject it into the container
+      ACS_CONNECTION_STRING: ${acs_connection_string}
+
 hooks:
   postprovision:
     posix:

@@ -23,7 +23,7 @@ jobs:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AZURE_ENV_ACS_CONNECTION: ${{ secrets.ACS_CONNECTION_STRING }}
+          AZURE_ENV_ACS_CONNECTION_STRING: ${{ secrets.ACS_CONNECTION_STRING }}
           
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}
