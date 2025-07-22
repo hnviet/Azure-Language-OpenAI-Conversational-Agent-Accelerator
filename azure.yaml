@@ -16,16 +16,9 @@ environments:
       embedding_deployment_type: "GlobalStandard"
 
       # these must exactly match your bicep params:
-      acr_name:                  "hnvietacr"
-      image_tag:                 "latest"
-      acs_connection_string:     ${{ secrets.ACS_CONNECTION_STRING }}
-
-services:
-  app:                              # ← must match the "app" service in the template
-    type: containerinstance
-    host: conv-agent-app           # ← **new**: the Bicep resource name of your container‐group
-    environmentVariables:
-      ACS_CONNECTION_STRING: ${acs_connection_string}
+      acr_name:    "hnvietacr"    # NOT acrName
+      image_tag:   "latest"       # your new param
+      acs_connection_string : ${{ secrets.ACS_CONNECTION_STRING }}
 
 hooks:
   postprovision:
