@@ -24,7 +24,6 @@ environments:
 services:
   app:
     type: containerinstance
-    host: conv-agent-app
     environmentVariables:
       # inject it into the container
       ACS_CONNECTION_STRING: ${acs_connection_string}
