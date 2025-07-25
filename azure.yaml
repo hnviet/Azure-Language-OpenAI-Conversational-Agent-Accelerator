@@ -8,16 +8,16 @@ environments:
   dev:
     parameters:
       # must match your existing AI Foundry SKUs & capacities:
-      gpt_model_name:            "gpt-4o-mini"
+      gpt_model_name:            "gpt-4o-mini1"
       gpt_deployment_capacity:   1
-      gpt_deployment_type:       "GlobalStandard"
-      embedding_model_name:      "text-embedding-ada-002"
+      gpt_deployment_type:       "GlobalStandard1"
+      embedding_model_name:      "text-embedding-ada-0021"
       embedding_deployment_capacity: 1
-      embedding_deployment_type: "GlobalStandard"
+      embedding_deployment_type: "GlobalStandard1"
 
       # these must exactly match your bicep params:
-      acr_name:    "hnvietacr"    # NOT acrName
-      image_tag:   "latest"       # your new param
+      acr_name:    "hnvietacr1"    # NOT acrName
+      image_tag:   "latest1"       # your new param
       acs_connection_string: ${{ secrets.ACS_CONNECTION_STRING }}
 
 hooks:
