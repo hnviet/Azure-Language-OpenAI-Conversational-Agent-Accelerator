@@ -51,6 +51,10 @@ param image_tag string
 @description('Connection string for Azure Communication Service (SMS)')
 param acs_connection_string string
 
+// ACS Connection String:
+@description('A test variable to test the deployment')
+param test_variable string
+
 // Variables:
 var suffix = uniqueString(subscription().id, resourceGroup().id, resourceGroup().location)
 

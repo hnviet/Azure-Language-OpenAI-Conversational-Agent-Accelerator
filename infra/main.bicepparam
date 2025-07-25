@@ -15,3 +15,5 @@ param acr_name = readEnvironmentVariable('AZURE_ENV_ACR_NAME', 'hnvietacr')
 param image_tag = readEnvironmentVariable('AZURE_ENV_IMAGE_TAG', 'latest')
 
 param acs_connection_string = readEnvironmentVariable('AZURE_ENV_ACS_CONNECTION_STRING', '')
+
+param test_variable = readEnvironmentVariable('AZURE_ENV_TEST_VARIABLE', 'empty value')
