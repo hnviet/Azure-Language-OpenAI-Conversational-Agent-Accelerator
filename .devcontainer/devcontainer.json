@@ -4,8 +4,13 @@
     "forwardPorts": [50505],
     "features": {
         "ghcr.io/azure/azure-dev/azd:latest": {},
-         "azure-cli": "latest"
+        "azure-cli": "latest",
+        "docker-in-docker": "latest"
     },
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "capAdd": ["SYS_ADMIN"],
     "customizations": {
         "vscode": {
             "extensions": [
