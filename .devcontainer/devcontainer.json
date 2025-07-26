@@ -6,8 +6,8 @@
     "--privileged"
   ],
   "features": {
-    // Azure Dev CLI (azd)
-    // "ghcr.io/devcontainers/features/azure-dev:1": {},
+    // Azure Dev CLI (azd)    
+    "ghcr.io/azure/azure-dev/azd:latest": {},
     // Azure CLI
     "ghcr.io/devcontainers/features/azure-cli:1": {},
     // Docker-in-Docker
