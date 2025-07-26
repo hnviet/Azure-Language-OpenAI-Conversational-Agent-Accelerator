@@ -290,3 +290,4 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
 
 //----------- Outputs -----------//
 output fqdn string = container_instance.properties.ipAddress.fqdn
+output appFqdn string = container_instance.properties.ipAddress.fqdn
