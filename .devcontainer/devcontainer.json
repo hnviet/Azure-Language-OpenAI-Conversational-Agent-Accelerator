@@ -3,7 +3,8 @@
   "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   "forwardPorts": [50505],
   "runArgs": [
-    "--privileged"
+    "--privileged",
+    "--group-add", "docker"
   ],
   "features": {
     // Azure Dev CLI (azd)    

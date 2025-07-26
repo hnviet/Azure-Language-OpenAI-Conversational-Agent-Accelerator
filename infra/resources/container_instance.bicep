@@ -82,7 +82,10 @@ var acrCreds = listCredentials(acr.id, '2022-12-01')
 //----------- Container Instance Resource -----------//
 resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
   name: name
-  location: location
+  location: location  
+  tags: {
+    'azd-service-name': 'app'
+  }
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
