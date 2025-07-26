@@ -80,7 +80,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
 var acrCreds = listCredentials(acr.id, '2022-12-01')
 
 //----------- Container Instance Resource -----------//
-resource container_instance 'Microsoft.App/containerGroups@2024-10-01-preview' = {
+resource container_instance 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: name
   location: location  
   identity: {
