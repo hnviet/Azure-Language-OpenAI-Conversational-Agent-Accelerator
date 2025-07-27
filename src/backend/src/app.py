@@ -100,10 +100,10 @@ PII_ENABLED = os.environ.get("PII_ENABLED", "false").lower() == "true"
 print(f"PII_ENABLED: {PII_ENABLED}")
 
 # after you’ve loaded your other env‐vars:
-#SMS_CONN_STR    = os.environ["ACS_CONNECTION_STRING"]
+SMS_CONN_STR    = os.environ["ACS_CONNECTION_STRING"]
 
 # create a long‐lived client
-#sms_client = SmsClient.from_connection_string(SMS_CONN_STR)
+sms_client = SmsClient.from_connection_string(SMS_CONN_STR)
 
 # Fallback function (RAG) definition:
 def fallback_function(
@@ -277,13 +277,13 @@ async def sms_event_handler(
             responses = await orchestrate_chat(text, app.state.orchestrator, chat_id=0)
 
             # send each response back as SMS
-            #for reply in responses:
-            #    await sms_client.send(
-            #        from_=to,
-            #        to=from_nr,
-            #        message=reply,
-            #        enable_delivery_report=True
-            #    )
+            for reply in responses:
+                await sms_client.send(
+                    from_=to,
+                    to=from_nr,
+                    message=reply,
+                    enable_delivery_report=True
+                )
 
     # 3) Acknowledge delivery
     return JSONResponse(status_code=200, content={})
