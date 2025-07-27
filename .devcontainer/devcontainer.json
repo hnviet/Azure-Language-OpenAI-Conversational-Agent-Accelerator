@@ -18,6 +18,11 @@
     // mount the host Docker socket so the inner daemon can use it
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
+  "containerEnv": {
+    // These names must match what your Bicep uses via readEnvironmentVariable
+    "AZURE_ENV_ACS_CONNECTION_STRING": "${{ secrets.ACS_CONNECTION_STRING }}",
+    "AZURE_ENV_TEST_VARIABLE":     "${{ secrets.TEST_VARIABLE }}"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
