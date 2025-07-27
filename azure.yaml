@@ -20,19 +20,19 @@ environments:
       image_tag:   "latest"       # your new param
       acs_connection_string: ${{ secrets.ACS_CONNECTION_STRING }}
 
-services:
-  app:                        # must match your service ID
-    project: src
-    language: python
-    host: containerapp # containerinstance not supported
-    environmentVariables:
-      ACS_CONNECTION_STRING:    ${acs_connection_string}
-      GPT_MODEL_NAME:           ${gpt_model_name}
-      GPT_DEPLOYMENT_TYPE:      ${gpt_deployment_type}
-      EMBEDDING_MODEL_NAME:     ${embedding_model_name}
-      IMAGE_TAG:                ${image_tag}
-      ACR_NAME:                 ${acr_name}
-      ACS_CONNECTION_STRING: ${acs_connection_string}
+# services:
+#   app:                        # must match your service ID
+#     project: src
+#     language: python
+#     host: containerapp # containerinstance not supported
+#     environmentVariables:
+#       ACS_CONNECTION_STRING:    ${acs_connection_string}
+#       GPT_MODEL_NAME:           ${gpt_model_name}
+#       GPT_DEPLOYMENT_TYPE:      ${gpt_deployment_type}
+#       EMBEDDING_MODEL_NAME:     ${embedding_model_name}
+#       IMAGE_TAG:                ${image_tag}
+#       ACR_NAME:                 ${acr_name}
+#       ACS_CONNECTION_STRING: ${acs_connection_string}
 
 hooks:
   postprovision:

@@ -35,7 +35,7 @@
     }
   },
   // after the container is created, add vscode→docker group
-  "postCreateCommand": "sudo usermod -aG docker $USER",
+  // "postCreateCommand": "sudo usermod -aG docker $USER",
   // still pull latest code on every start
   "postStartCommand": "git pull origin main && echo 'Run setup script:' && echo '  az login && source infra/setup_azd_parameters.sh'",
   "remoteUser": "vscode",
